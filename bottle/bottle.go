@@ -16,11 +16,12 @@ func (e EmptyBottleError) Error() string {
 
 // Bottle is a stores data from readers
 type Bottle struct {
+	ID       string
 	Contents []byte
 }
 
-func NewBottle() *Bottle {
-	return &Bottle{}
+func NewBottle(id string) *Bottle {
+	return &Bottle{ID: id}
 }
 
 // Fill puts the contents from the io.Reader into the bottle

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	b := bottle.NewBottle()
+	b := bottle.NewBottle("try-me")
 	b.Fill(os.Stdin)
 
 	fmt.Println("Pouring..")
