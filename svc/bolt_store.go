@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const BOTTLE_BUCKET = "bottles"
+const BottleBucket = "bottles"
 
 // BoltBottleStore is a BoltDB backed bottle store
 type BoltBottleStore struct {
@@ -28,7 +28,7 @@ func (s *BoltBottleStore) Get(id string) (*bottle.Bottle, error) {
 	b := bottle.NewBottle(id)
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-		buck := tx.Bucket([]byte(BOTTLE_BUCKET))
+		buck := tx.Bucket([]byte(BottleBucket))
 		contents := buck.Get([]byte(id))
 		if contents != nil {
 			return errors.New("Bottle ID Not Found")
@@ -39,4 +39,12 @@ func (s *BoltBottleStore) Get(id string) (*bottle.Bottle, error) {
 		return b, err
 	}
 	return b, nil
+}
+
+func (s *BoltBottleStore) Put(b *bottle.Bottle) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
+		buck := tx.Bucket([]byte(BottleBucket))
+		return buck.Put([]byte(b.ID), b.Contents)
+
+	})
 }
