@@ -1,4 +1,4 @@
-package svc
+package crate
 
 import (
 	"github.com/tchaudhry91/bottle/bottle"
@@ -8,4 +8,5 @@ import (
 type BottleStore interface {
 	Get(id string) (b *bottle.Bottle, err error)
 	Put(b *bottle.Bottle) error
+	Delete(id string) error
 }

@@ -1,4 +1,4 @@
-package svc
+package crate
 
 import (
 	"errors"
@@ -45,6 +45,12 @@ func (s *BoltBottleStore) Put(b *bottle.Bottle) error {
 	return s.db.Update(func(tx *bolt.Tx) error {
 		buck := tx.Bucket([]byte(BottleBucket))
 		return buck.Put([]byte(b.ID), b.Contents)
+	})
+}
 
+func (s *BoltBottleStore) Delete(id string) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
+		buck := tx.Bucket([]byte(BottleBucket))
+		return buck.Delete([]byte(id))
 	})
 }
