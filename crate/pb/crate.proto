@@ -4,11 +4,15 @@ package pb;
 
 message Bottle{
     string id = 1;
-    bytes content = 2;
+    bytes contents = 2;
 }
 
 message StoreResponse {
     string err = 1;
+}
+
+message StoreRequest {
+    Bottle bottle = 1;
 }
 
 message GetRequest {
@@ -21,7 +25,7 @@ message GetResponse{
 }
 
 service Crate {
-    rpc Pour (GetRequest) returns (Bottle) {}
-    rpc Store (Bottle) returns (StoreResponse) {}
-    rpc Drain (GetRequest) returns (Bottle) {}
+    rpc Pour (GetRequest) returns (GetResponse) {}
+    rpc Store (StoreRequest) returns (StoreResponse) {}
+    rpc Drain (GetRequest) returns (GetResponse) {}
 }

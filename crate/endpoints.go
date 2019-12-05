@@ -6,6 +6,20 @@ import (
 	"github.com/tchaudhry91/bottle/bottle"
 )
 
+type Endpoints struct {
+	Store endpoint.Endpoint
+	Drain endpoint.Endpoint
+	Pour  endpoint.Endpoint
+}
+
+func MakeServerEndpoints(svc CrateService) Endpoints {
+	return Endpoints{
+		Store: makeStoreEndpoint(svc),
+		Drain: makeDrainEndpoint(svc),
+		Pour:  makePourEndpoint(svc),
+	}
+}
+
 type getRequest struct {
 	ID string `json:"id,omitempty"`
 }
