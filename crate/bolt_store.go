@@ -30,9 +30,10 @@ func (s *BoltBottleStore) Get(id string) (*bottle.Bottle, error) {
 	err := s.db.View(func(tx *bolt.Tx) error {
 		buck := tx.Bucket([]byte(BottleBucket))
 		contents := buck.Get([]byte(id))
-		if contents != nil {
+		if contents == nil {
 			return errors.New("Bottle ID Not Found")
 		}
+		b.Contents = contents
 		return nil
 	})
 	if err != nil {
@@ -43,7 +44,10 @@ func (s *BoltBottleStore) Get(id string) (*bottle.Bottle, error) {
 
 func (s *BoltBottleStore) Put(b *bottle.Bottle) error {
 	return s.db.Update(func(tx *bolt.Tx) error {
-		buck := tx.Bucket([]byte(BottleBucket))
+		buck, err := tx.CreateBucketIfNotExists([]byte(BottleBucket))
+		if err != nil {
+			return err
+		}
 		return buck.Put([]byte(b.ID), b.Contents)
 	})
 }

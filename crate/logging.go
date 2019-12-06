@@ -34,13 +34,13 @@ func (mw *LoggingMiddleware) StoreBottle(b *bottle.Bottle) (err error) {
 func (mw *LoggingMiddleware) DrainBottle(id string) (b *bottle.Bottle, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
-			"method", "Drain",
+			"method", "drain",
 			"id", id,
 			"err", err,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	b, err = mw.next.PourBottle(id)
+	b, err = mw.next.DrainBottle(id)
 	return
 }
 

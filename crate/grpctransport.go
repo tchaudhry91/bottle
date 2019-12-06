@@ -68,7 +68,7 @@ func (s *grpcServer) Store(ctx context.Context, req *pb.StoreRequest) (*pb.Store
 
 func decodeGRPCStoreRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*pb.StoreRequest)
-	return storeRequest{Bottle: pbToBottle(req.Bottle)}, nil
+	return storeRequest{Bottle: PBToBottle(req.Bottle)}, nil
 }
 
 func encodeGRPCStoreResponse(ctx context.Context, response interface{}) (interface{}, error) {
@@ -86,19 +86,19 @@ func decodeGRPCGetRequest(ctx context.Context, grpcReq interface{}) (interface{}
 func encodeGRPCGetResponse(ctx context.Context, response interface{}) (interface{}, error) {
 	resp := response.(getResponse)
 	return &pb.GetResponse{
-		Bottle: bottleToPB(resp.Bottle),
+		Bottle: BottleToPB(resp.Bottle),
 		Err:    resp.Err,
 	}, nil
 }
 
-func bottleToPB(bottle *bottle.Bottle) *pb.Bottle {
+func BottleToPB(bottle *bottle.Bottle) *pb.Bottle {
 	return &pb.Bottle{
 		Id:       bottle.ID,
 		Contents: bottle.Contents,
 	}
 }
 
-func pbToBottle(b *pb.Bottle) *bottle.Bottle {
+func PBToBottle(b *pb.Bottle) *bottle.Bottle {
 	return &bottle.Bottle{
 		ID:       b.Id,
 		Contents: b.Contents,
