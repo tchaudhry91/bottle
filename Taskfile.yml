@@ -11,7 +11,14 @@ tasks:
     cmds:
       - mkdir release || true
       - go build -o release/crate ./cmd/server
+  build:
+    cmds:
+      - task: build-server
+      - task: build-client
   test:
     cmds:
       - golangci-lint run
       - go test -v ./...
+  sonar:
+    cmds:
+      - sonar-scanner -Dsonar.login=$SONAR_TOKEN
