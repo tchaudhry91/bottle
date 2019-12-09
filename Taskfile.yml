@@ -1,0 +1,17 @@
+# https://taskfile.dev
+
+version: "2"
+
+tasks:
+  build-client:
+    cmds:
+      - mkdir release || true
+      - go build -o release/bottle-cli ./cmd/client
+  build-server:
+    cmds:
+      - mkdir release || true
+      - go build -o release/crate ./cmd/server
+  test:
+    cmds:
+      - golangci-lint run
+      - go test -v ./...
