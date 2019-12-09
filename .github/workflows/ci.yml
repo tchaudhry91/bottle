@@ -1,0 +1,20 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-go@v1
+        with:
+          go-version: "1.13"
+      - uses: sonarsource/sonarcloud-github-action@master
+      - run: curl -sL https://taskfile.dev/install.sh | sh
+      - run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.17.1
+      - run: ./bin/task test
+      - run: ./bin/task build
+      - run: ./bin/task sonar
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

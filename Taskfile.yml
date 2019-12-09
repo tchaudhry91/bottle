@@ -17,6 +17,7 @@ tasks:
       - task: build-client
   test:
     cmds:
+      - go fmt ./...
       - golangci-lint run
       - go test -v ./...
   sonar:
