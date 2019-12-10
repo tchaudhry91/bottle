@@ -10,6 +10,7 @@ type Endpoints struct {
 	Store endpoint.Endpoint
 	Drain endpoint.Endpoint
 	Pour  endpoint.Endpoint
+	List  endpoint.Endpoint
 }
 
 func MakeServerEndpoints(svc CrateService) Endpoints {
@@ -17,6 +18,7 @@ func MakeServerEndpoints(svc CrateService) Endpoints {
 		Store: makeStoreEndpoint(svc),
 		Drain: makeDrainEndpoint(svc),
 		Pour:  makePourEndpoint(svc),
+		List:  makeListEndpoint(svc),
 	}
 }
 
@@ -79,5 +81,25 @@ func makeStoreEndpoint(svc CrateService) endpoint.Endpoint {
 			}, nil
 		}
 		return storeResponse{}, nil
+	}
+}
+
+type emptyRequest struct{}
+
+type listResponse struct {
+	Bottles []string `json:"bottles,omitempty"`
+	Err     string   `json:"err,omitempty"`
+}
+
+func makeListEndpoint(svc CrateService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		bb, err := svc.ListBottles()
+		if err != nil {
+			return listResponse{
+				Bottles: bb,
+				Err:     err.Error(),
+			}, nil
+		}
+		return listResponse{Bottles: bb}, nil
 	}
 }

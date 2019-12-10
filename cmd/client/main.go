@@ -8,7 +8,6 @@ import (
 	"github.com/tchaudhry91/bottle/crate/pb"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/grpc"
-	"log"
 	"os"
 	"strings"
 )
@@ -33,7 +32,7 @@ func main() {
 			&cli.StringFlag{
 				Name:        "mode",
 				Aliases:     []string{"m"},
-				Value:       "fill",
+				Value:       "list",
 				Usage:       "Mode to operate in, fill/drain/pour",
 				EnvVars:     []string{"BOTTLE_MODE"},
 				Destination: &mode,
@@ -62,6 +61,8 @@ func main() {
 				return pour(id, client)
 			case "drain":
 				return drain(id, client)
+			case "list":
+				return list(client)
 			}
 			return nil
 		},
@@ -69,7 +70,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		os.Exit(1)
 	}
 }
 
@@ -121,13 +122,29 @@ func drain(id string, client pb.CrateClient) error {
 	}
 	if resp.Err != "" {
 		fmt.Printf("Failed to fetch bottle to drain: %s", resp.Err)
-		return err
+		return fmt.Errorf(resp.Err)
 	}
 	b = crate.PBToBottle(resp.Bottle)
 	err = b.Drain(os.Stdout)
 	if err != nil {
 		fmt.Printf("Failed to drain bottle: %s", err)
+		return fmt.Errorf(resp.Err)
+	}
+	return nil
+}
+
+func list(client pb.CrateClient) error {
+	resp, err := client.List(context.Background(), &pb.Empty{})
+	if err != nil {
+		fmt.Printf("Failed to fetch bottle list: %s", err)
 		return err
+	}
+	if resp.Err != "" {
+		fmt.Printf("Failed to fetch bottle list: %s", resp.Err)
+		return fmt.Errorf(resp.Err)
+	}
+	for _, b := range resp.Bottles {
+		fmt.Println(b)
 	}
 	return nil
 }

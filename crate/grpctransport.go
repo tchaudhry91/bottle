@@ -13,6 +13,7 @@ type grpcServer struct {
 	store kitgrpc.Handler
 	pour  kitgrpc.Handler
 	drain kitgrpc.Handler
+	list  kitgrpc.Handler
 }
 
 // NewGRPCServer makes a of endpoints available as a gRPC Crate Server
@@ -39,31 +40,45 @@ func NewGRPCServer(endpoints Endpoints, logger log.Logger) pb.CrateServer {
 			encodeGRPCStoreResponse,
 			options...,
 		),
+		list: kitgrpc.NewServer(
+			endpoints.List,
+			decodeGRPCEmptyRequest,
+			encodeGRPCListResponse,
+			options...,
+		),
 	}
 }
 
 func (s *grpcServer) Pour(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
-	_, rep, err := s.pour.ServeGRPC(ctx, req)
+	_, resp, err := s.pour.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	return rep.(*pb.GetResponse), nil
+	return resp.(*pb.GetResponse), nil
 }
 
 func (s *grpcServer) Drain(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
-	_, rep, err := s.drain.ServeGRPC(ctx, req)
+	_, resp, err := s.drain.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	return rep.(*pb.GetResponse), nil
+	return resp.(*pb.GetResponse), nil
 }
 
 func (s *grpcServer) Store(ctx context.Context, req *pb.StoreRequest) (*pb.StoreResponse, error) {
-	_, rep, err := s.store.ServeGRPC(ctx, req)
+	_, resp, err := s.store.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	return rep.(*pb.StoreResponse), nil
+	return resp.(*pb.StoreResponse), nil
+}
+
+func (s *grpcServer) List(ctx context.Context, req *pb.Empty) (*pb.ListResponse, error) {
+	_, resp, err := s.list.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.ListResponse), nil
 }
 
 func decodeGRPCStoreRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
@@ -88,6 +103,18 @@ func encodeGRPCGetResponse(ctx context.Context, response interface{}) (interface
 	return &pb.GetResponse{
 		Bottle: BottleToPB(resp.Bottle),
 		Err:    resp.Err,
+	}, nil
+}
+
+func decodeGRPCEmptyRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
+	return emptyRequest{}, nil
+}
+
+func encodeGRPCListResponse(ctx context.Context, response interface{}) (interface{}, error) {
+	resp := response.(listResponse)
+	return &pb.ListResponse{
+		Bottles: resp.Bottles,
+		Err:     resp.Err,
 	}, nil
 }
 

@@ -58,3 +58,21 @@ func (s *BoltBottleStore) Delete(id string) error {
 		return buck.Delete([]byte(id))
 	})
 }
+
+func (s *BoltBottleStore) List() ([]*bottle.Bottle, error) {
+	bb := []*bottle.Bottle{}
+	err := s.db.View(func(tx *bolt.Tx) error {
+		buck := tx.Bucket([]byte(BottleBucket))
+		if buck == nil {
+			return errors.New("No records found")
+		}
+		err := buck.ForEach(func(k []byte, v []byte) error {
+			b := bottle.NewBottle(string(k))
+			b.Contents = v
+			bb = append(bb, b)
+			return nil
+		})
+		return err
+	})
+	return bb, err
+}

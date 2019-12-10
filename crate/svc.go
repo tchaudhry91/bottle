@@ -8,6 +8,7 @@ type CrateService interface {
 	StoreBottle(*bottle.Bottle) error
 	PourBottle(id string) (*bottle.Bottle, error)
 	DrainBottle(id string) (*bottle.Bottle, error)
+	ListBottles() ([]string, error)
 }
 
 type crateService struct {
@@ -38,4 +39,17 @@ func (svc *crateService) DrainBottle(id string) (b *bottle.Bottle, err error) {
 	}
 	err = svc.store.Delete(id)
 	return b, err
+}
+
+// ListBottles lists all bottles present in the crate
+func (svc *crateService) ListBottles() (bb []string, err error) {
+	bottles, err := svc.store.List()
+	if err != nil {
+		return []string{}, err
+	}
+	ids := []string{}
+	for _, b := range bottles {
+		ids = append(ids, b.ID)
+	}
+	return ids, nil
 }

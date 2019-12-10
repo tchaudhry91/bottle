@@ -56,3 +56,17 @@ func (mw *LoggingMiddleware) PourBottle(id string) (b *bottle.Bottle, err error)
 	b, err = mw.next.PourBottle(id)
 	return
 }
+
+func (mw *LoggingMiddleware) ListBottles() (bb []string, err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log(
+			"method", "list",
+			"found", len(bb),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+	bb, err = mw.next.ListBottles()
+	return
+
+}

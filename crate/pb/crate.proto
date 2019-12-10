@@ -24,8 +24,16 @@ message GetResponse{
     string err = 2;
 }
 
+message ListResponse{
+    repeated string bottles = 1;
+    string err = 2;
+}
+
+message Empty{}
+
 service Crate {
     rpc Pour (GetRequest) returns (GetResponse) {}
     rpc Store (StoreRequest) returns (StoreResponse) {}
     rpc Drain (GetRequest) returns (GetResponse) {}
+    rpc List (Empty) returns (ListResponse) {}
 }
