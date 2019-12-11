@@ -12,4 +12,5 @@
 *.out
 
 release/*
+bin/*
 .scannerwork/*
